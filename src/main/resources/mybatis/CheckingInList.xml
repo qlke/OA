@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.evistek.oa.mapper.CheckingInList">
+    <resultMap id="CheckingInListBaseResultMap" type="com.evistek.oa.entity.CheckingInList">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="check_type" property="checkType" jdbcType="VARCHAR"/>
+        <result column="corp_id" property="corpId" jdbcType="VARCHAR"/>
+        <result column="location_result" property="locationResult" jdbcType="VARCHAR"/>
+        <result column="base_check_time" property="baseCheckTime" jdbcType="BIGINT"/>
+        <result column="group_id" property="groupId" jdbcType="BIGINT"/>
+        <result column="time_result" property="timeResult" jdbcType="VARCHAR"/>
+        <result column="user_id" property="userId" jdbcType="VARCHAR"/>
+        <result column="record_id" property="recordId" jdbcType="VARCHAR"/>
+        <result column="work_date" property="workDate" jdbcType="BIGINT"/>
+        <result column="source_type" property="sourceType" jdbcType="VARCHAR"/>
+        <result column="user_check_time" property="userCheckTime" jdbcType="BIGINT"/>
+        <result column="plan_id" property="planId" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="CheckingInListBaseC">
+        id,check_type,corp_id,location_result,base_check_time,group_id,time_result,user_id,record_id,work_date,source_type,user_check_time,plan_id
+    </sql>
+    <sql id="CheckingInlistBaseP">
+        #{id},#{checkType},#{corpId},#{locationResult},#{baseCheckTime},#{groupId},#{timeResult},#{userId},#{recordId},#{workDate},#{sourceType},#{userCheckTime},#{planId}
+    </sql>
+
+    <insert id="addCheckingInList" parameterType="com.evistek.oa.entity.CheckingInList">
+        insert into checking_in_list (<include refid="CheckingInListBaseC"/>) values (<include
+            refid="CheckingInlistBaseP"/>)
+    </insert>
+
+    <select id="selectCheckingInListById" parameterType="com.evistek.oa.model.CheckingInListBase"
+            resultMap="CheckingInListBaseResultMap">
+        select * from checking_in_list where id=#{id}
+    </select>
+    <select id="selectCheckingInListDate" parameterType="com.evistek.oa.model.CheckingInListBase"
+            resultMap="CheckingInListBaseResultMap">
+        select * from  checking_in_list where work_date=#{workDate} and user_id=#{userId}
+    </select>
+
+</mapper>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.evistek.oa.mapper.PositionMapper">
+    <resultMap id="PositionResultMap" type="com.evistek.oa.entity.Position">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="identify" property="identify" jdbcType="VARCHAR"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="findPositionByEId" parameterType="String" resultMap="PositionResultMap">
+        select * from position where id in(select position_id from employee_position where employee_id = #{employeeId});
+    </select>
+
+    <select id="findPosition" resultMap="PositionResultMap" parameterType="String">
+        select * from position
+        <where>
+            true
+            <if test="name != null">and name like concat(concat('%',#{name}),'%')</if>
+        </where>
+    </select>
+
+    <!--根据职位名称查找职位-->
+    <select id="findPositionByName" parameterType="String" resultMap="PositionResultMap">
+        select * from position where name = #{name};
+    </select>
+
+    <select id="findPositionTotal" resultType="java.lang.Integer" parameterType="String">
+        select count(*) from position
+        <where>
+            true
+            <if test="name != null">and name like concat(concat('%',#{name}),'%')</if>
+        </where>
+    </select>
+
+    <select id="findPositionById" parameterType="String" resultMap="PositionResultMap">
+        select * from position where id = #{id};
+    </select>
+
+    <insert id="addPosition" parameterType="Position">
+        insert into position (id,name,identify,description)
+        values (#{id},#{name},#{identify},#{description});
+    </insert>
+
+    <delete id="deletePositionById" parameterType="String">
+        delete from position where id = #{id};
+    </delete>
+
+    <update id="updatePositionById" parameterType="Position">
+        update position
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="identify != null">identify = #{identify},</if>
+            <if test="description != null">description = #{description}</if>
+        </set>
+        where id=#{id};
+    </update>
+
+</mapper>

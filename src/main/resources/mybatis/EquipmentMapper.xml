@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.evistek.oa.mapper.Equipment">
+    <resultMap id="EquipmentBaseMap" type="com.evistek.oa.entity.Equipment">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="mid" property="mid" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="used" property="used" jdbcType="INTEGER"/>
+        <result column="chip_id" property="chipId" jdbcType="VARCHAR"/>
+        <result column="board_id" property="boardId" jdbcType="VARCHAR"/>
+        <result column="sn_code" property="snCode" jdbcType="VARCHAR"/>
+        <result column="create_user" property="createUser" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+        <result column="director" property="director" jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap id="EquipmentMap" type="com.evistek.oa.model.EquipmentModels">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="mid" property="mid" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="used" property="used" jdbcType="INTEGER"/>
+        <result column="chip_id" property="chipId" jdbcType="VARCHAR"/>
+        <result column="board_id" property="boardId" jdbcType="VARCHAR"/>
+        <result column="sn_code" property="snCode" jdbcType="VARCHAR"/>
+        <result column="create_user" property="createUser" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+        <result column="director" property="director" jdbcType="VARCHAR"/>
+        <association property="equipmentModelModel" column="mid"
+                     select="com.evistek.oa.mapper.EquipmentModel.selectEquipmentModelById"/>
+    </resultMap>
+
+    <sql id="EquipmentC">
+        mid,name,used,chip_id,board_id,sn_code,create_user,create_time,director
+    </sql>
+    <sql id="EquipmentP">
+        #{mid},#{name},#{used},#{chipId},#{boardId},#{snCode},#{createUser},now(),#{director}
+    </sql>
+
+    <insert id="addEquipment" parameterType="com.evistek.oa.entity.Equipment">
+        insert into equipment (<include refid="EquipmentC"/>)values (<include refid="EquipmentP"/>)
+    </insert>
+    <update id="updateEquipment" parameterType="com.evistek.oa.entity.Equipment">
+        update equipment
+        <set>
+            <trim suffixOverrides=",">
+                <if test="mid>-1">mid=#{mid},</if>
+                <if test="null!=name and ''!=name">name=#{name},</if>
+                <if test="used>-1">used=#{used},</if>
+                <if test="null!=director and ''!=director">director=#{director},</if>
+                <if test="null!=chipId and ''!=chipId">chip_id=#{chipId},</if>
+                <if test="null!=boardId and ''!=boardId">board_id=#{boardId},</if>
+            </trim>
+        </set>
+        where id=#{id}
+    </update>
+    <delete id="deleteEquipment" parameterType="java.lang.Integer">
+        delete from equipment where id=#{id}
+    </delete>
+
+    <select id="selectEquipmentById" parameterType="java.lang.Integer" resultMap="EquipmentMap">
+        select * from equipment where id=#{id}
+    </select>
+    <select id="selectEquipmentList" resultMap="EquipmentMap">
+        select * from equipment
+    </select>
+    <select id="searchEquipment" parameterType="com.evistek.oa.model.EquipmentBase" resultMap="EquipmentMap">
+        select * from equipment
+        <where>
+            <if test="mid>-1">and mid=#{mid}</if>
+            <if test="null!=name and name!=''">and name like "%"#{name}"%"</if>
+            <if test="null!=chipId and chipId!=''">and chip_id like "%"#{chipId}"%"</if>
+            <if test="null!=boardId and boardId!=''">and board_id=#{boardId}</if>
+            <if test="null!=createUser and createUser!=''">and create_user=#{createUser}</if>
+            <if test="null!=snCode and snCode!=''">and sn_code=#{snCode}</if>
+            <if test="null!=director and director!=''">and director=#{director}</if>
+        </where>
+        order by create_time desc
+        <if test="isLimit==true">
+            limit #{page},#{pageNumber}
+        </if>
+    </select>
+
+    <select id="searchEquipmentCount" parameterType="com.evistek.oa.model.EquipmentBase" resultType="Integer">
+        select count(*) from equipment
+        <where>
+            <if test="mid>-1">and mid=#{mid}</if>
+            <if test="null!=name and name!=''">and name like "%"#{name}"%"</if>
+            <if test="null!=chipId and chipId!=''">and chip_id like "%"#{chipId}"%"</if>
+            <if test="null!=boardId and boardId!=''">and board_id=#{boardId}</if>
+            <if test="null!=createUser and createUser!=''">and create_user=#{createUser}</if>
+            <if test="null!=snCode and snCode!=''">and sn_code=#{snCode}</if>
+            <if test="null!=director and director!=''">and director=#{director}</if>
+        </where>
+    </select>
+
+</mapper>

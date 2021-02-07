@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.evistek.oa.mapper.SystemLogMapper">
+    <resultMap id="systemLogResultMap" type="com.evistek.oa.entity.SystemLog">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="user" property="user" jdbcType="VARCHAR"/>
+        <result column="type" property="type" jdbcType="VARCHAR"/>
+        <result column="api_name" property="apiName" jdbcType="VARCHAR"/>
+        <result column="parameter" property="parameter" jdbcType="VARCHAR"/>
+        <result column="method" property="method" jdbcType="VARCHAR"/>
+        <result column="ip" property="ip" jdbcType="VARCHAR"/>
+        <result column="result" property="result" jdbcType="INTEGER"/>
+        <result column="time" property="time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="systemLogColumns">
+        id, user, type, api_name, parameter, method, ip, result, time
+    </sql>
+
+    <sql id="systemLogProperties">
+        uuid(), #{user}, #{type}, #{apiName}, #{parameter}, #{method}, #{ip}, #{result}, now()
+    </sql>
+
+    <insert id="addSystemLog" parameterType="SystemLog">
+        insert into system_log (<include refid="systemLogColumns"/>)
+        values (<include refid="systemLogProperties"/>);
+    </insert>
+
+    <select id="findSystemLog" parameterType="java.util.Map" resultMap="systemLogResultMap">
+        select * from system_log
+        <where>
+            true
+            <if test="user != null and user != 'null'">AND user LIKE concat(concat('%',#{user}),'%')</if>
+            <if test="type != null and type != 'null'">AND type = #{type}</if>
+            <if test="start != null">AND time &gt;= #{start}</if>
+            <if test="end != null">AND time &lt;= #{end}</if>
+        </where>
+        order by `time` DESC;
+    </select>
+
+    <select id="findSystemLogTotal" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(*) from system_log
+        <where>
+            true
+            <if test="user != null and user != 'null'">AND user LIKE concat(concat('%',#{user}),'%')</if>
+            <if test="type != null and type != 'null'">AND type = #{type}</if>
+            <if test="start != null">AND time &gt;= #{start}</if>
+            <if test="end != null">AND time &lt;= #{end}</if>
+        </where>
+    </select>
+
+    <delete id="deleteSysLog" parameterType="java.util.Date">
+        delete from system_log where time &lt; #{time};
+    </delete>
+</mapper>

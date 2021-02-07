@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.evistek.oa.mapper.ObjectNoticeMapper">
+    <resultMap id="ObjectNoticeResultMap" type="com.evistek.oa.entity.ObjectNotice">
+        <result column="object_id" property="objectId" jdbcType="VARCHAR"/>
+        <result column="notice_id" property="noticeId" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="findObjectNoticeByNoticeId" parameterType="String" resultMap="ObjectNoticeResultMap">
+        select * from object_notice where notice_id = #{noticeId};
+    </select>
+
+    <insert id="addObjectNotice" parameterType="ObjectNotice">
+        insert into object_notice (object_id, notice_id) value
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item},#{noticeId})
+        </foreach>
+    </insert>
+
+    <delete id="deleteObjectNoticeByNoticeId" parameterType="String">
+        delete from object_notice where notice_id = #{noticeId};
+    </delete>
+
+</mapper>

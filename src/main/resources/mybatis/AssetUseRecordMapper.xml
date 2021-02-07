@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.evistek.oa.mapper.AssetUseRecordMapper">
+    <resultMap id="AssetUseRecordResultMap" type="com.evistek.oa.entity.AssetUseRecord">
+        <result column="use_type" property="useType" jdbcType="INTEGER"/>
+        <result column="asset_id" property="assetId" jdbcType="VARCHAR"/>
+        <result column="receive_employee_id" property="receiveEmployeeId" jdbcType="VARCHAR"/>
+        <result column="receive_department_id" property="receiveDepartmentId" jdbcType="VARCHAR"/>
+        <result column="receive_time" property="receiveTime" jdbcType="TIMESTAMP"/>
+        <result column="return_employee_id" property="returnEmployeeId" jdbcType="VARCHAR"/>
+        <result column="return_department_id" property="returnDepartmentId" jdbcType="VARCHAR"/>
+        <result column="return_time" property="returnTime" jdbcType="TIMESTAMP"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <association property="assetName" column="asset_id"
+                     select="findAssetName"/>
+        <association property="receiveEmployeeName" column="receive_employee_id"
+                     select="findReceiveEmployeeName"/>
+        <association property="receiveDepartmentName" column="receive_department_id"
+                     select="findReceiveDepartmentName"/>
+        <association property="returnEmployeeName" column="return_employee_id"
+                     select="findReturnEmployeeName"/>
+        <association property="returnDepartmentName" column="return_department_id"
+                     select="findReturnDepartmentName"/>
+    </resultMap>
+
+    <select id="findAssetName" parameterType="String" resultType="String">
+        select number from asset where id = #{asset_id};
+    </select>
+
+    <select id="findReceiveEmployeeName" parameterType="String" resultType="String">
+        select name from employee where id = #{receive_employee_id};
+    </select>
+
+    <select id="findReceiveDepartmentName" parameterType="String" resultType="String">
+        select name from department where id = #{receive_department_id};
+    </select>
+
+    <select id="findReturnEmployeeName" parameterType="String" resultType="String">
+        select name from employee where id = #{return_employee_id};
+    </select>
+
+    <select id="findReturnDepartmentName" parameterType="String" resultType="String">
+        select name from department where id = #{return_department_id};
+    </select>
+
+    <select id="findAssetUseRecord" parameterType="String" resultMap="AssetUseRecordResultMap">
+        select * from asset_use_record where asset_id = #{assetId};
+    </select>
+
+    <select id="findAssetUseRecordByRED" parameterType="String" resultMap="AssetUseRecordResultMap">
+        select * from asset_use_record where receive_employee_id = #{receiveEmployeeId} and status = 1;
+    </select>
+
+    <insert id="addAssetUseRecord" parameterType="AssetUseRecord">
+        insert into asset_use_record (use_type,asset_id,receive_employee_id,receive_department_id,receive_time,status)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{useType},#{item},#{receiveEmployeeId},#{receiveDepartmentId},#{receiveTime},#{status})
+        </foreach>
+    </insert>
+
+    <update id="updateAssetUseRecordByAssetId" parameterType="java.util.Map">
+        update asset_use_record
+        <set>
+            <if test="returnEmployeeId != null">return_employee_id = #{returnEmployeeId},</if>
+            <if test="returnDepartmentId != null">return_department_id = #{returnDepartmentId},</if>
+            <if test="returnTime != null">return_time = #{returnTime},</if>
+            <if test="status != -1">status = #{status}</if>
+        </set>
+        where asset_id in
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and status = 1;
+    </update>
+
+    <delete id="deleteAURByAssetId" parameterType="String">
+        delete from asset_use_record where asset_id = #{assetId};
+    </delete>
+</mapper>

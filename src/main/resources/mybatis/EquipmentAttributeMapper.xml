@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.evistek.oa.mapper.EquipmentAttribute">
+    <resultMap id="EquipmentAttributeBase" type="com.evistek.oa.entity.EquipmentAttribute">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="tid" property="tid" jdbcType="INTEGER"/>
+        <result column="t_name" property="tName" jdbcType="VARCHAR"/>
+        <result column="code" property="code" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="prefix" property="prefix" jdbcType="VARCHAR"/>
+        <result column="suffix" property="suffix" jdbcType="VARCHAR"/>
+        <result column="used" property="used" jdbcType="INTEGER"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+    </resultMap>
+
+
+    <sql id="EquipmentAttributeC">
+        tid,t_name,code,name,prefix,suffix,used,description
+    </sql>
+    <sql id="EquipmentAttributeP">
+        #{tid},#{tName},#{code},#{name},#{prefix},#{suffix},#{used},#{description}
+    </sql>
+    <insert id="addEquipmentAttribute" parameterType="com.evistek.oa.entity.EquipmentAttribute" useGeneratedKeys="true"
+            keyColumn="id" keyProperty="id">
+        insert into equipment_attribute (<include refid="EquipmentAttributeC"/>) values (<include
+            refid="EquipmentAttributeP"/>)
+    </insert>
+    <update id="updateEquipmentAttribute" parameterType="com.evistek.oa.entity.EquipmentAttribute">
+        update equipment_attribute
+        <set>
+            <trim suffixOverrides=",">
+                prefix=#{prefix},
+                suffix=#{suffix},
+                <if test="tid>-1">tid=#{tid},</if>
+                <if test="null!=tName and ''!=tName">t_name=#{tName},</if>
+                <if test="null!=code and ''!=code">code=#{code},</if>
+                <if test="null!=name and ''!=name">name=#{name},</if>
+                <if test="used>-1">used=#{used},</if>
+                <if test="null!=description and ''!=description">description=#{description},</if>
+            </trim>
+        </set>
+        where id=#{id}
+    </update>
+    <delete id="deleteEquipmentAttribute" parameterType="java.lang.Integer">
+        delete from equipment_attribute where id=#{id}
+    </delete>
+    <select id="selectEquipmentAttributeById" parameterType="java.lang.Integer" resultMap="EquipmentAttributeBase">
+        select * from equipment_attribute where id=#{id}
+    </select>
+    <select id="selectEquipmentAttributes" parameterType="com.evistek.oa.model.EquipmentAttributeBase"
+            resultMap="EquipmentAttributeBase">
+        select * from equipment_attribute
+        <where>
+            <if test="tid>-1">and tid=#{tid}</if>
+            <if test="used>-1">and used=#{used}</if>
+            <if test="null!=name">and name like "%"#{name}"%"</if>
+        </where>
+    </select>
+    <select id="selectEquipmentAttributeAll" resultMap="EquipmentAttributeBase">
+        select * from equipment_attribute
+    </select>
+</mapper>

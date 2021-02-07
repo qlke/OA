@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.evistek.oa.mapper.RepairMaterialMapper.xml">
+    <resultMap id="RepairMaterialResultMap" type="com.evistek.oa.entity.RepairMaterial">
+        <result column="repair_id" property="repairId" jdbcType="VARCHAR"/>
+        <result column="material_id" property="materialId" jdbcType="VARCHAR"/>
+        <result column="repair_cost_id" property="repairCostId" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="findRMByRepairId" parameterType="String" resultMap="RepairMaterialResultMap">
+        select * from repair_material where repair_id = #{repairId};
+    </select>
+
+    <select id="findRMByRepairCostId" parameterType="String" resultMap="RepairMaterialResultMap">
+        select * from repair_material where repair_cost_id = #{repairCostId};
+    </select>
+
+    <insert id="addRepairMaterial" parameterType="Map">
+        insert into repair_material (repair_id,material_id,repair_cost_id) value
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{repairId},#{item},#{repairCostId})
+        </foreach>
+    </insert>
+
+    <delete id="deleteRMByRepairId" parameterType="String">
+        delete from repair_material where repair_id = #{repairId};
+    </delete>
+
+    <delete id="deleteRMByRepairCostId" parameterType="String">
+        delete from repair_material where repair_cost_id = #{repairCostId};
+    </delete>
+</mapper>

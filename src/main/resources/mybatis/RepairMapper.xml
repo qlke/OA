@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.evistek.oa.mapper.RepairMapper">
+    <resultMap id="RepairResultMap" type="com.evistek.oa.entity.Repair">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="department" property="department" jdbcType="VARCHAR"/>
+        <result column="apply_user" property="applyUser" jdbcType="VARCHAR"/>
+        <result column="client_name" property="clientName" jdbcType="VARCHAR"/>
+        <result column="product_name" property="productName" jdbcType="VARCHAR"/>
+        <result column="product_number" property="productNumber" jdbcType="VARCHAR"/>
+        <result column="expire" property="expire" jdbcType="INTEGER"/>
+        <result column="salesman" property="salesman" jdbcType="VARCHAR"/>
+        <result column="apply_time" property="applyTime" jdbcType="TIMESTAMP"/>
+        <result column="re_completion_time" property="reCompletionTime" jdbcType="TIMESTAMP"/>
+        <result column="service_user" property="serviceUser" jdbcType="VARCHAR"/>
+        <result column="act_finish_time" property="actFinishTime" jdbcType="TIMESTAMP"/>
+        <result column="un_phenomenon" property="unPhenomenon" jdbcType="VARCHAR"/>
+        <result column="fault_cause" property="faultCause" jdbcType="VARCHAR"/>
+        <result column="service_result" property="serviceResult" jdbcType="VARCHAR"/>
+        <result column="im_measure" property="imMeasure" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+        <result column="create_user" property="createUser" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="VARCHAR"/>
+        <result column="update_user" property="updateUser" jdbcType="TIMESTAMP"/>
+        <result column="process_instance_id" property="processInstanceId" jdbcType="VARCHAR"/>
+        <result column="result" property="result" jdbcType="INTEGER"/>
+        <association property="materials" column="id"
+                     select="com.evistek.oa.mapper.MaterialMapper.findMaterialByRepairId"/>
+    </resultMap>
+
+    <sql id="RepairColumn">
+       id,department,apply_user,client_name,product_name,product_number,expire,salesman,apply_time,
+       re_completion_time,service_user,act_finish_time,un_phenomenon,fault_cause,service_result,
+       im_measure,status,create_time,create_user,update_time,update_user,process_instance_id,result
+    </sql>
+
+    <sql id="RepairParameter">
+        uuid(),#{department},#{applyUser},#{clientName},#{productName},#{productNumber},#{expire},#{salesman},now(),
+        #{reCompletionTime},#{serviceUser},#{actFinishTime},#{unPhenomenon},#{faultCause},#{serviceResult},
+        #{imMeasure},#{status},now(),#{createUser},now(),#{updateUser},#{processInstanceId},
+        #{result}
+    </sql>
+
+    <select id="findRepair" resultMap="RepairResultMap" parameterType="Map">
+        select * from repair
+        <where>
+            true
+            <if test="productName != null">and product_name like concat(concat('%',#{productName}),'%')</if>
+            <if test="productNumber != null">and product_number like concat(concat('%',#{productNumber}),'%')</if>
+        </where>
+    </select>
+
+    <select id="findRepairById" parameterType="String" resultMap="RepairResultMap">
+        select * from repair where id = #{id};
+    </select>
+
+    <select id="findRepairByProcessInstanceId" parameterType="String" resultMap="RepairResultMap">
+        select * from repair where process_instance_id = #{processInstanceId};
+    </select>
+
+    <select id="findRepairTotal" resultType="Integer" parameterType="Map">
+        select count(*) from repair
+        <where>
+            true
+            <if test="productName != null">and product_name like concat(concat('%',#{productName}),'%')</if>
+            <if test="productNumber != null">and product_number like concat(concat('%',#{productNumber}),'%')</if>
+        </where>
+    </select>
+
+
+    <insert id="addRepair" parameterType="Repair">
+        insert into repair(<include refid="RepairColumn"/>)
+        value (<include refid="RepairParameter"/>)
+    </insert>
+
+    <update id="updateRepair" parameterType="Repair">
+        update repair
+        <set>
+            <if test="department != null">department = #{department},</if>
+            <if test="applyUser != null">apply_user = #{applyUser},</if>
+            <if test="clientName != null">client_name = #{clientName},</if>
+            <if test="productName != null">product_name = #{productName},</if>
+            <if test="productNumber != null">product_number = #{productNumber},</if>
+            <if test="expire != -1">expire = #{expire},</if>
+            <if test="salesman != null">salesman = #{salesman},</if>
+            <if test="applyTime != null">apply_time = #{applyTime},</if>
+            <if test="reCompletionTime != null">re_completion_time = #{reCompletionTime},</if>
+            <if test="serviceUser != null">service_user = #{serviceUser},</if>
+            <if test="actFinishTime != null">act_finish_time = #{actFinishTime},</if>
+            <if test="unPhenomenon != null">un_phenomenon = #{unPhenomenon},</if>
+            <if test="faultCause != null">fault_cause = #{faultCause},</if>
+            <if test="serviceResult != null">service_result = #{serviceResult},</if>
+            <if test="imMeasure != null">im_measure = #{imMeasure},</if>
+            <if test="status != -1">status = #{status},</if>
+            <if test="updateTime != null">update_time = now(),</if>
+            <if test="updateUser != null">update_user = #{updateUser},</if>
+            <if test="processInstanceId != null">process_instance_id = #{processInstanceId},</if>
+            <if test="result != -1">result = #{result}</if>
+        </set>
+        where id=#{id};
+    </update>
+
+    <delete id="deleteRepairById" parameterType="String">
+        delete from repair where id = #{id};
+    </delete>
+</mapper>

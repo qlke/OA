@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.evistek.oa.mapper.OrganizationMapper">
+    <resultMap id="OrganizationResultMap" type="com.evistek.oa.entity.Organization">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="number" property="number" jdbcType="INTEGER"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="father_id" property="fatherId" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="findOrganizationById" parameterType="String" resultMap="OrganizationResultMap">
+        select * from organization where id = #{id};
+    </select>
+
+    <select id="findOrganizationByName" parameterType="String" resultMap="OrganizationResultMap">
+        select * from organization where name = #{name}
+    </select>
+
+    <select id="findOrganizationByFatherId" parameterType="String" resultMap="OrganizationResultMap">
+        select * from organization where father_id = #{fatherId};
+    </select>
+
+    <insert id="addOrganization" parameterType="Organization">
+        insert into organization (id, name, number, description, father_id)
+        values (uuid(),#{name},#{number},#{description},#{fatherId});
+    </insert>
+
+    <delete id="deleteOrganizationById" parameterType="String">
+        delete from organization where id = #{id};
+    </delete>
+
+    <update id="updateOrganizationById" parameterType="Organization">
+        update organization
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="number != -1">number = #{number},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="fatherId != null">father_id = #{fatherId}</if>
+        </set>
+        where id = #{id};
+    </update>
+</mapper>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.evistek.oa.mapper.PositionAuthorityMapper">
+    <resultMap id="PositionAuthorityResultMap" type="com.evistek.oa.entity.PositionAuthority">
+        <result column="position_id" property="positionId" jdbcType="VARCHAR"/>
+        <result column="authority_id" property="authorityId" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <insert id="addPositionAuthority" parameterType="java.util.Map">
+        insert into position_authority (position_id, authority_id)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{positionId},#{item})
+        </foreach>
+    </insert>
+
+    <delete id="deletePositionAuthorityByPId" parameterType="String">
+        delete from position_authority where position_id = #{positionId};
+    </delete>
+
+</mapper>

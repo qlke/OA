@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.evistek.oa.mapper.EmployeeMapper">
+    <resultMap id="EmployeeResultMap" type="com.evistek.oa.entity.Employee">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="password" property="password" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="gender" property="gender" jdbcType="INTEGER"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="email" property="email" jdbcType="VARCHAR"/>
+        <result column="hobby" property="hobby" jdbcType="VARCHAR"/>
+        <result column="politics" property="politics" jdbcType="VARCHAR"/>
+        <result column="address" property="address" jdbcType="VARCHAR"/>
+        <result column="organization_id" property="organizationId" jdbcType="VARCHAR"/>
+        <result column="department_id" property="departmentId" jdbcType="VARCHAR"/>
+        <result column="rank" property="rank" jdbcType="VARCHAR"/>
+        <result column="father_id" property="fatherId" jdbcType="VARCHAR"/>
+        <result column="entry_time" property="entryTime" jdbcType="TIMESTAMP"/>
+        <result column="dimission_time" property="dimissionTime" jdbcType="TIMESTAMP"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="photo_url" property="photoUrl" jdbcType="VARCHAR"/>
+        <result column="create_user" property="createUser" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_user" property="updateUser" jdbcType="VARCHAR"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <association property="organizationName" column="organization_id" select="findOrganizationName"/>
+        <association property="departmentName" column="department_id" select="findDepartmentName"/>
+        <association property="fatherEmployeeName" column="father_id" select="findFatherEmployeeName"/>
+        <association property="positions" column="id" select="com.evistek.oa.mapper.PositionMapper.findPositionByEId"/>
+    </resultMap>
+
+    <select id="findOrganizationName" parameterType="String" resultType="String">
+        select name from organization where id = #{organization_id};
+    </select>
+
+    <select id="findDepartmentName" parameterType="String" resultType="String">
+        select name from department where id = #{department_id};
+    </select>
+
+    <select id="findFatherEmployeeName" parameterType="String" resultType="String">
+        select name from employee where id = #{father_id};
+    </select>
+
+    <sql id="employeeColumn">
+        id,password,name,gender,phone,email,hobby,politics,address,
+        organization_id,department_id,rank,father_id,entry_time,dimission_time,status,
+        photo_url,create_user,create_time,update_user,update_time
+    </sql>
+
+    <sql id="employeeParameter">
+        #{id},#{password},#{name},#{gender},#{phone},#{email},#{hobby},#{politics},#{address},
+        #{organizationId},#{departmentId},#{rank},#{fatherId},#{entryTime},
+        #{dimissionTime},#{status},#{photoUrl},#{createUser},now(),#{updateUser},now()
+    </sql>
+
+    <select id="findEmployeeByEmail" parameterType="String" resultMap="EmployeeResultMap">
+        select * from employee where email = #{email};
+    </select>
+
+    <select id="findEmployeeByDId" parameterType="String" resultMap="EmployeeResultMap">
+        select * from employee where department_id = #{departmentId};
+    </select>
+
+    <select id="findEmployeeById" parameterType="String" resultMap="EmployeeResultMap">
+        select * from employee where id = #{id};
+    </select>
+
+    <select id="findEmployeeByFatherId" parameterType="String" resultMap="EmployeeResultMap">
+        select * from employee where father_id = #{fatherId};
+    </select>
+
+    <select id="findEmployeeByPhone" parameterType="String" resultMap="EmployeeResultMap">
+        select * from employee where phone = #{phone};
+    </select>
+
+    <!--根据组织机构或部门查找员工-->
+    <select id="findEmployeeId" parameterType="java.util.Map" resultType="java.util.List">
+        select * from employee
+        <where>
+            true
+            <if test="OrganizationId.size != 0">and organizationId in
+                <foreach collection="organizationId" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="departmentId.size != 0">or departmentId in
+                <foreach collection="departmentId" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <!--根据数据权限查找数据-->
+    <select id="findEmployeeByPId" resultMap="EmployeeResultMap" parameterType="List">
+        select * from employee where organization_id in
+        (select organization_id from data_authority where position_id in
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item.id}
+        </foreach>
+        )
+        or
+        department_id in
+        (select department_id from data_authority where position_id in
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item.id}
+        </foreach>
+        );
+    </select>
+
+    <insert id="addEmployee" parameterType="Employee">
+        insert into employee(<include refid="employeeColumn"/>)
+        values (<include refid="employeeParameter"/>);
+    </insert>
+
+    <delete id="deleteEmployeeById" parameterType="String">
+        delete from employee where id = #{id};
+    </delete>
+
+    <update id="updateEmployeeById" parameterType="Employee">
+        update employee
+        <set>
+            <if test="password != null">password = #{password},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="gender != -1">gender = #{gender},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="hobby != null">hobby = #{hobby},</if>
+            <if test="politics != null">politics = #{politics},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="organizationId != null">organization_id = #{organizationId},</if>
+            <if test="departmentId != null">department_id = #{departmentId},</if>
+            <if test="rank != null">rank = #{rank},</if>
+            <if test="fatherId != null">father_id = #{fatherId},</if>
+            <if test="entryTime != null">entry_time = #{entryTime},</if>
+            <if test="dimissionTime != null">dimission_time = #{dimissionTime},</if>
+            <if test="status != -1">status = #{status},</if>
+            <if test="photoUrl != null">photo_url = #{photoUrl},</if>
+            <if test="updateUser != null">update_user = #{updateUser},</if>
+            <if test="updateTime != null">update_time = now()</if>
+        </set>
+        where id = #{id};
+    </update>
+</mapper>

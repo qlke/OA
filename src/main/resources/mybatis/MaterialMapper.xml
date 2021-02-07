@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.evistek.oa.mapper.MaterialMapper">
+    <resultMap id="MaterialResultMap" type="com.evistek.oa.entity.Material">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="number" property="number" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="count" property="count" jdbcType="INTEGER"/>
+        <result column="price" property="price" jdbcType="DECIMAL"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <select id="findMaterialByRepairId" parameterType="String" resultMap="MaterialResultMap">
+    select * from material where id in
+    (select material_id from repair_material where repair_id = #{id});
+    </select>
+
+    <select id="findMaterialByRepairCostId" parameterType="String" resultMap="MaterialResultMap">
+    select * from material where id in
+    (select material_id from repair_material where repair_cost_id = #{id});
+    </select>
+
+    <select id="findMaterialByIds" parameterType="List" resultMap="MaterialResultMap">
+        select * from material where id in
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <insert id="addMaterial" parameterType="List">
+        insert into material (id,`number`,`name`,`count`,price,remark,`type`) value
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{item.number},#{item.name},#{item.count},#{item.price},#{item.remark},#{item.type})
+        </foreach>
+    </insert>
+
+    <delete id="deleteMaterialByIds" parameterType="List">
+        delete from material where id in
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <delete id="deleteMaterialByRepairId" parameterType="String">
+        delete from material where id in
+        (select material_id from repair_material where repair_id = #{repairId});
+    </delete>
+
+    <delete id="deleteMaterialByRCId" parameterType="String">
+        delete from material where id in
+        (select material_id from repair_material where repair_cost_id = #{repairCostId});
+    </delete>
+</mapper>

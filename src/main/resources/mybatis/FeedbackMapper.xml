@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.evistek.oa.mapper.Feedback">
+    <resultMap id="FeedbackBaseMap" type="com.evistek.oa.entity.Feedback">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="feedback_number" property="feedbackNumber" jdbcType="VARCHAR"/>
+        <result column="feedback_type" property="feedbackType" jdbcType="INTEGER"/>
+        <result column="title" property="title" jdbcType="VARCHAR"/>
+        <result column="body" property="body" jdbcType="LONGVARCHAR"/>
+        <result column="equipment_id" property="equipmentId" jdbcType="INTEGER"/>
+        <result column="annex_url" property="annexUrl" jdbcType="VARCHAR"/>
+        <result column="soft_version" property="softVersion" jdbcType="VARCHAR"/>
+        <result column="feedback_status" property="feedbackStatus" jdbcType="INTEGER"/>
+        <result column="create_user" property="createUser" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+        <result column="allot_user" property="allotUser" jdbcType="VARCHAR"/>
+        <result column="process_instance_id" property="processInstanceId" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="FeedbackBaseC">
+        feedback_number,feedback_type,title,body,equipment_id,annex_url,soft_version,feedback_status,create_user,create_time,allot_user,process_instance_id
+    </sql>
+    <sql id="FeedbackBaseP">
+        #{feedbackNumber},#{feedbackType},#{title},#{body},#{equipmentId},#{annexUrl},#{softVersion},#{feedbackStatus},#{createUser},now(),#{allotUser},#{processInstanceId}
+    </sql>
+    <insert id="addFeedback" parameterType="com.evistek.oa.entity.Feedback">
+        insert into feedback (<include refid="FeedbackBaseC"/>) values (<include refid="FeedbackBaseP"/>)
+    </insert>
+
+    <update id="updateFeedbackByProcessId" parameterType="com.evistek.oa.entity.Feedback">
+        update feedback
+        <set>
+            <trim suffixOverrides=",">
+                <if test="feedbackStatus>-1">feedback_status=#{feedbackStatus}</if>
+            </trim>
+        </set>
+        where process_instance_id=#{processInstanceId}
+    </update>
+    <update id="updateFeedbackById" parameterType="com.evistek.oa.entity.Feedback">
+        update feedback
+        <set>
+            <trim suffixOverrides=",">
+                <if test="feedbackType>-1">feedback_type=#{feedbackType},</if>
+                <if test="equipmentId>-1">equipment_id=#{equipmentId},</if>
+                <if test="null!=title">title=#{title},</if>
+                <if test="null!=body">body=#{body},</if>
+                <if test="null!=annexUrl">annex_url=#{annexUrl},</if>
+                <if test="null!=softVersion">soft_version=#{softVersion},</if>
+                <if test="null!=allotUser">allot_user=#{allotUser},</if>
+                <if test="null!=processInstanceId">process_instance_id=#{processInstanceId},</if>
+                <if test="-1!=feedbackStatus">feedback_status=#{feedbackStatus}</if>
+            </trim>
+        </set>
+        where id=#{id}
+    </update>
+
+    <select id="selectFeedbackById" parameterType="com.evistek.oa.model.FeedbackBase" resultMap="FeedbackBaseMap">
+        select * from feedback
+        <where>
+            <if test="id>-1">and id=#{id}</if>
+            <if test="null!=feedbackNumber">and feedback_number=#{feedbackNumber}</if>
+            <if test="null!=processInstanceId">process_instance_id=#{processInstanceId}</if>
+        </where>
+    </select>
+    <select id="selectFeedbackList" parameterType="com.evistek.oa.model.FeedbackBase" resultMap="FeedbackBaseMap">
+        select * from feedback
+        <where>
+            true
+            <if test="feedbackType>-1">and feedback_type=#{feedbackType}</if>
+            <if test="null!=title and title!=''">and title like "%"#{title}"%"</if>
+            <if test="null!=body and body!=''">and body like "%"#{body}"%"</if>
+            <if test="equipmentId>-1">and equipment_id=#{equipmentId}</if>
+            <if test="null!=softVersion and softVersion!=''">and soft_version=#{softVersion}</if>
+            <if test="null!=createUser and createUser!=''">and create_user=#{createUser}</if>
+            <if test="null!=allotUser and allotUser!=''">and allot_user=#{allotUser}</if>
+            <if test="null!=feedbackNumber and feedbackNumber!=''">and feedback_number=#{feedbackNumber}</if>
+        </where>
+        order by create_time desc
+        <if test="isLimit==true">
+            limit #{page},#{pageNumber}
+        </if>
+    </select>
+
+    <select id="findFeedbackTotal" resultType="Integer">
+        select count(*) from feedback
+        <where>
+            true
+            <if test="feedbackType>-1">and feedback_type=#{feedbackType}</if>
+            <if test="null!=title and title!=''">and title like "%"#{title}"%"</if>
+            <if test="null!=body and body!=''">and body like "%"#{body}"%"</if>
+            <if test="equipmentId>-1">and equipment_id=#{equipmentId}</if>
+            <if test="null!=softVersion and softVersion!=''">and soft_version=#{softVersion}</if>
+            <if test="null!=createUser and createUser!=''">and create_user=#{createUser}</if>
+            <if test="null!=allotUser and allotUser!=''">and allot_user=#{allotUser}</if>
+            <if test="null!=feedbackNumber and feedbackNumber!=''">and feedback_number=#{feedbackNumber}</if>
+        </where>
+    </select>
+
+    <delete id="deleteFeedback" parameterType="com.evistek.oa.model.FeedbackBase">
+        delete from feedback where id = #{id};
+    </delete>
+</mapper>

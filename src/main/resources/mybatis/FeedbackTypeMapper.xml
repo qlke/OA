@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.evistek.oa.mapper.FeedbackType">
+    <resultMap id="FeedbackTypeBaseMap" type="com.evistek.oa.entity.FeedbackType">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="number_prefix" property="numberPrefix" jdbcType="VARCHAR"/>
+        <result column="director" property="director" jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap id="FeedbackTypeModel" type="com.evistek.oa.model.FeedbackTypeModel">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="number_prefix" property="numberPrefix" jdbcType="VARCHAR"/>
+        <result column="director" property="director" jdbcType="VARCHAR"/>
+    </resultMap>
+    <select id="selectFeedbackTypeList" resultMap="FeedbackTypeBaseMap">
+        select * from feedback_type
+    </select>
+    <select id="selectFeedbackTypeModelList" resultMap="FeedbackTypeModel">
+        select * from feedback_type
+    </select>
+    <select id="selectFeedbackTypeById" parameterType="java.lang.Integer" resultMap="FeedbackTypeBaseMap">
+        select * from feedback_type where id=#{id}
+    </select>
+</mapper>

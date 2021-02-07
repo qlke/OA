@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.evistek.oa.mapper.CheckingInRecordList">
+    <resultMap id="CheckingInRecordListBaseResultMap" type="com.evistek.oa.entity.CheckingInRecordList">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="check_type" property="checkType" jdbcType="VARCHAR"/>
+        <result column="gmt_modified" property="gmtModified" jdbcType="BIGINT"/>
+        <result column="plan_check_time" property="planCheckTime" jdbcType="BIGINT"/>
+        <result column="base_mac_addr" property="baseMacAddr" jdbcType="VARCHAR"/>
+        <result column="corp_id" property="corpId" jdbcType="VARCHAR"/>
+        <result column="location_result" property="locationResult" jdbcType="VARCHAR"/>
+        <result column="is_legal" property="isLegal" jdbcType="VARCHAR"/>
+        <result column="base_check_time" property="baseCheckTime" jdbcType="BIGINT"/>
+        <result column="group_id" property="groupId" jdbcType="BIGINT"/>
+        <result column="time_result" property="timeResult" jdbcType="VARCHAR"/>
+        <result column="gmt_create" property="gmtCreate" jdbcType="BIGINT"/>
+        <result column="user_id" property="userId" jdbcType="VARCHAR"/>
+        <result column="device_sn" property="deviceSn" jdbcType="VARCHAR"/>
+        <result column="user_address" property="userAddress" jdbcType="VARCHAR"/>
+        <result column="class_id" property="classId" jdbcType="BIGINT"/>
+        <result column="work_date" property="workDate" jdbcType="BIGINT"/>
+        <result column="source_type" property="sourceType" jdbcType="VARCHAR"/>
+        <result column="biz_id" property="bizId" jdbcType="VARCHAR"/>
+        <result column="user_check_time" property="userCheckTime" jdbcType="BIGINT"/>
+        <result column="location_method" property="locationMethod" jdbcType="VARCHAR"/>
+        <result column="plan_id" property="planId" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <sql id="CheckingInRecordListBaseC">
+        id,check_type,gmt_modified,plan_check_time,base_mac_addr,corp_id,
+        location_result,is_legal,base_check_time,group_id,time_result,gmt_create,
+        user_id,device_sn,user_address,class_id,work_date,source_type,biz_id,user_check_time,
+        location_method,plan_id
+    </sql>
+    <sql id="CheckingInRecordListBaseP">
+        #{id},#{checkType},#{gmtModified},#{planCheckTime},#{baseMacAddr},#{corpId},#{locationResult},#{isLegal},#{baseCheckTime},#{groupId},
+        #{timeResult},#{gmtCreate},#{userId},#{deviceSn},#{userAddress},#{classId},#{workDate},#{sourceType},#{bizId},#{userCheckTime},#{locationMethod},#{planId}
+    </sql>
+
+    <insert id="addCheckingInRecordList" parameterType="com.evistek.oa.entity.CheckingInRecordList">
+        insert into checking_in_recordlist (<include refid="CheckingInRecordListBaseC"/>) values (<include
+            refid="CheckingInRecordListBaseP"/>)
+    </insert>
+    <select id="selectCheckingInRecordListById" parameterType="com.evistek.oa.model.CheckingInRecordListBase" resultMap="CheckingInRecordListBaseResultMap">
+        select * from checking_in_recordlist where id=#{id}
+    </select>
+</mapper>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.evistek.oa.mapper.DepartmentMapper">
+    <resultMap id="DepartmentResultMap" type="com.evistek.oa.entity.Department">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="number" property="number" jdbcType="INTEGER"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="organization_id" property="organizationId" jdbcType="VARCHAR"/>
+        <result column="father_id" property="fatherId" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="departmentColumns">
+        id,name,number,description,organization_id,father_id
+    </sql>
+
+    <sql id="departmentParameter">
+        uuid(),#{name},#{number},#{description},#{organizationId},#{fatherId}
+    </sql>
+
+    <select id="findDepartmentById" resultMap="DepartmentResultMap">
+        select * from department where id = #{id};
+    </select>
+
+    <select id="findDepartmentByOrganizationId" parameterType="String" resultMap="DepartmentResultMap">
+        select * from department where organization_id = #{organizationId};
+    </select>
+
+    <!--根据父级id查找部门-->
+    <select id="findDepartmentByFatherId" parameterType="String" resultMap="DepartmentResultMap">
+        select * from department where father_id = #{fatherId};
+    </select>
+
+    <insert id="addDepartment" parameterType="Department">
+        insert into department (<include refid="departmentColumns"/>)
+        values (<include refid="departmentParameter"/>);
+    </insert>
+
+    <delete id="deleteDepartmentById" parameterType="String">
+        delete from department where id = #{id};
+    </delete>
+
+    <update id="updateDepartmentById" parameterType="Department">
+        update department
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="number != -1">number = #{number},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="organizationId != null">organization_id = #{organizationId},</if>
+            <if test="fatherId != null">father_id = #{fatherId}</if>
+        </set>
+        where id=#{id};
+    </update>
+
+</mapper>

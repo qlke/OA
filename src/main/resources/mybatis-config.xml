@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <typeAliases>
+        <package name="com.evistek.oa.entity"/>
+    </typeAliases>
+    <mappers>
+        <mapper resource="mybatis/EmployeeMapper.xml"/>
+        <mapper resource="mybatis/AuthorityMapper.xml"/>
+        <mapper resource="mybatis/DepartmentMapper.xml"/>
+        <mapper resource="mybatis/PositionMapper.xml"/>
+        <mapper resource="mybatis/EmployeeMapper.xml"/>
+        <mapper resource="mybatis/SystemLogMapper.xml"/>
+        <mapper resource="mybatis/PositionAuthorityMapper.xml"/>
+        <mapper resource="mybatis/OrganizationMapper.xml"/>
+        <mapper resource="mybatis/EmployeePositionMapper.xml"/>
+        <mapper resource="mybatis/AssetMapper.xml"/>
+        <mapper resource="mybatis/DepartmentEmployeeAssetMapper.xml"/>
+        <mapper resource="mybatis/AssetUseRecordMapper.xml"/>
+        <mapper resource="mybatis/AssetTypeMapper.xml"/>
+        <mapper resource="mybatis/ApiAuthorityMapper.xml"/>
+        <mapper resource="mybatis/DataAuthorityMapper.xml"/>
+        <mapper resource="mybatis/LeaveMapper.xml"/>
+        <mapper resource="mybatis/NoticeMapper.xml"/>
+        <mapper resource="mybatis/ObjectNoticeMapper.xml"/>
+        <mapper resource="mybatis/RepairMapper.xml"/>
+        <mapper resource="mybatis/MaterialMapper.xml"/>
+        <mapper resource="mybatis/RepairMaterialMapper.xml"/>
+        <mapper resource="mybatis/RepairCostMapper.xml"/>
+        <mapper resource="mybatis/SaleMapper.xml"/>
+        <mapper resource="mybatis/SaleReturnMapper.xml"/>
+        <mapper resource="mybatis/TempEmployeeMapper.xml"/>
+        <mapper resource="mybatis/CheckingInList.xml"/>
+        <mapper resource="mybatis/CheckingInRecordList.xml"/>
+        <mapper resource="mybatis/CheckingInUser.xml"/>
+        <mapper resource="mybatis/FeedbackMapper.xml"/>
+        <mapper resource="mybatis/FeedbackTypeMapper.xml"/>
+        <mapper resource="mybatis/EquipmentMapper.xml"/>
+        <mapper resource="mybatis/EquipmentTypeMapper.xml"/>
+        <mapper resource="mybatis/EquipmentAttributeMapper.xml"/>
+        <mapper resource="mybatis/EquipmentBindTypeMapper.xml"/>
+        <mapper resource="mybatis/EquipmentModelMapper.xml"/>
+    </mappers>
+</configuration>

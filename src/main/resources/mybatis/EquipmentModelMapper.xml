@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.evistek.oa.mapper.EquipmentModel">
+    <resultMap id="EquipmentModelBase" type="com.evistek.oa.entity.EquipmentModel">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="m_code" property="mCode" jdbcType="VARCHAR"/>
+        <result column="soft_url" property="softUrl" jdbcType="VARCHAR"/>
+        <result column="spec_url" property="specUrl" jdbcType="VARCHAR"/>
+        <result column="used" property="used" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+        <result column="director" property="director" jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap id="EquipmentModel" type="com.evistek.oa.model.EquipmentModelModel">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="m_code" property="mCode" jdbcType="VARCHAR"/>
+        <result column="soft_url" property="softUrl" jdbcType="VARCHAR"/>
+        <result column="spec_url" property="specUrl" jdbcType="VARCHAR"/>
+        <result column="used" property="used" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+        <result column="director" property="director" jdbcType="VARCHAR"/>
+        <collection property="equipmentBindTypeList" ofType="com.evistek.oa.model.EquipmentBindTypeModel"
+                    column="id" select="com.evistek.oa.mapper.EquipmentBindType.selectEquipmentByMid"/>
+    </resultMap>
+    <sql id="EquipmentModelC">
+        id,name,m_code,soft_url,spec_url,used,create_time,director
+    </sql>
+    <sql id="EquipmentModelP">
+        #{id},#{name},#{mCode},#{softUrl},#{specUrl},#{used},now(),#{director}
+    </sql>
+    <insert id="addEquipmentModel" parameterType="com.evistek.oa.entity.EquipmentModel" useGeneratedKeys="true"
+            keyColumn="id" keyProperty="id">
+        insert into equipment_model (<include refid="EquipmentModelC"/>) values (<include refid="EquipmentModelP"/>)
+    </insert>
+    <update id="updateEquipmentModel" parameterType="com.evistek.oa.entity.EquipmentModel">
+        update equipment_model
+        <set>
+            <trim suffixOverrides=",">
+                <if test="null!=name and name!=''">name=#{name},</if>
+                <if test="null!=softUrl and softUrl!=''">soft_url=#{softUrl},</if>
+                <if test="null!=specUrl and specUrl!=''">spec_url=#{specUrl},</if>
+                <if test="used>-1">used=#{used},</if>
+                <if test="null!=director and director!=''">director=#{director},</if>
+            </trim>
+        </set>
+        where id=#{id} or m_code=#{mCode}
+    </update>
+    <delete id="deleteEquipmentModel" parameterType="java.lang.Integer">
+        delete from equipment_model where id=#{id}
+    </delete>
+    <select id="selectEquipmentModelById" parameterType="java.lang.Integer" resultMap="EquipmentModel">
+        select * from equipment_model where id=#{id}
+    </select>
+    <select id="selectEquipmentModelByMCode" parameterType="java.lang.String" resultMap="EquipmentModel">
+        select * from equipment_model where m_code=#{mCode}
+    </select>
+    <select id="selectEquipmentModels" resultMap="EquipmentModel">
+        select * from equipment_model
+    </select>
+    <select id="selectEquipmentModelsBase" resultMap="EquipmentModelBase">
+        select * from equipment_model
+    </select>
+    <select id="searchEquipmentModelsBase" parameterType="com.evistek.oa.model.EquipmentModelBase" resultMap="EquipmentModelBase">
+        select * from equipment_model
+        <where>
+            <if test="null!=name and name!=''">and name like "%"#{name}"%"</if>
+            <if test="null!=mCode and mCode!=''">and m_code=#{snCode}</if>
+        </where>
+        order by create_time desc
+        <if test="isLimit==true">
+            limit #{page},#{pageNumber}
+        </if>
+    </select>
+
+    <select id="searchEquipmentModelsBaseCount" parameterType="com.evistek.oa.model.EquipmentModelBase" resultType="Integer">
+        select count(*) from equipment_model
+        <where>
+            <if test="null!=name and name!=''">and name like "%"#{name}"%"</if>
+            <if test="null!=mCode and mCode!=''">and m_code=#{snCode}</if>
+        </where>
+    </select>
+</mapper>

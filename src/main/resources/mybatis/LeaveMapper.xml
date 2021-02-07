@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.evistek.oa.mapper.LeaveMapper">
+    <resultMap id="LeaveResultMap" type="com.evistek.oa.entity.Leave">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="process_instance_id" property="processInstanceId" jdbcType="VARCHAR"/>
+        <result column="employee_id" property="employeeId" jdbcType="VARCHAR"/>
+        <result column="department" property="department" jdbcType="VARCHAR"/>
+        <result column="type" property="type" jdbcType="VARCHAR"/>
+        <result column="reason" property="reason" jdbcType="VARCHAR"/>
+        <result column="duration" property="duration" jdbcType="INTEGER"/>
+        <result column="start_time" property="startTime" jdbcType="TIMESTAMP"/>
+        <result column="end_time" property="endTime" jdbcType="TIMESTAMP"/>
+        <result column="apply_time" property="applyTime" jdbcType="TIMESTAMP"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <association property="employeeName" column="employee_id" select="findEmployeeName"/>
+    </resultMap>
+
+    <select id="findEmployeeName" resultType="String" parameterType="String">
+        select name from employee where id = #{employee_id};
+    </select>
+
+    <select id="findLeaveByProcessInstanceId" resultMap="LeaveResultMap" parameterType="String">
+      select * from `leave` where process_instance_id = #{processInstanceId} order by apply_time desc;
+    </select>
+
+    <select id="findLeaveByEId" resultMap="LeaveResultMap" resultType="String">
+        select * from `leave` where employee_id = #{employeeId} order by apply_time desc;
+    </select>
+
+    <select id="findLeaveTotalByEId" resultType="Integer" parameterType="String">
+        select count(*) from `leave` where employee_id = #{employeeId};
+    </select>
+
+    <insert id="addLeave" parameterType="Leave">
+        insert into `leave` (id, process_instance_id, employee_id, department, type, reason, duration, start_time, end_time, apply_time, status)
+        value (uuid(),#{processInstanceId},#{employeeId},#{department},#{type},#{reason},#{duration},#{startTime},#{endTime},now(),#{status});
+    </insert>
+
+    <update id="updateLeaveById" parameterType="Leave">
+        update `leave`
+        <set>
+            <if test="processInstanceId != null">process_instance_id = #{processInstanceId},</if>
+            <if test="employeeId != null">employee_id = #{employeeId},</if>
+            <if test="department != null">department = #{department},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="reason != null">reason = #{reason},</if>
+            <if test="duration != -1">duration = #{duration},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="applyTime != null">apply_time = #{applyTime},</if>
+            <if test="status != -1">status = #{status}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteLeave" parameterType="String">
+        delete from `leave` where process_instance_id = #{processInstanceId};
+    </delete>
+</mapper>

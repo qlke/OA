@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.evistek.oa.mapper.ApiAuthorityMapper">
+    <resultMap id="ApiAuthorityResultMap" type="com.evistek.oa.entity.ApiAuthority">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="method" property="method" jdbcType="VARCHAR"/>
+        <result column="authority" property="authority" jdbcType="VARCHAR"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="findApiAuthority" parameterType="java.util.Map" resultMap="ApiAuthorityResultMap">
+    select * from api_authority where name = #{apiName} and method = #{apiMethod};
+    </select>
+</mapper>

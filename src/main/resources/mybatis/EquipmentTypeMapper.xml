@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.evistek.oa.mapper.EquipmentType">
+    <resultMap id="EquipmentTypeBase" type="com.evistek.oa.entity.EquipmentType">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="must" property="must" jdbcType="INTEGER"/>
+        <result column="used" property="used" jdbcType="INTEGER"/>
+        <result column="input_type" property="inputType" jdbcType="INTEGER"/>
+        <result column="sort_weight" property="sortWeight" jdbcType="INTEGER"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="EquipmentTypeC">
+        name,must,used,input_type,sort_weight,description
+    </sql>
+    <sql id="EquipmentTypeP">
+        #{name},#{must},#{used},#{inputType},#{sortWeight},#{description}
+    </sql>
+
+    <insert id="addEquipmentType" parameterType="com.evistek.oa.entity.EquipmentType" useGeneratedKeys="true"
+            keyColumn="id" keyProperty="id">
+        insert into equipment_type (<include refid="EquipmentTypeC"/>) values (<include refid="EquipmentTypeP"/>)
+    </insert>
+
+    <update id="updateEquipmentType" parameterType="com.evistek.oa.entity.EquipmentType">
+        update equipment_type
+        <set>
+            <trim suffixOverrides=",">
+                <if test="null!=name">name=#{name},</if>
+                <if test="must>-1">must=#{must},</if>
+                <if test="used>-1">used=#{used},</if>
+                <if test="inputType>-1">input_type=#{inputType},</if>
+                <if test="sortWeight>0">sort_weight=#{sortWeight},</if>
+                <if test="null!=description and ''!=description">description=#{description},</if>
+            </trim>
+        </set>
+        where id=#{id}
+    </update>
+    <delete id="deleteEquipmentType" parameterType="java.lang.Integer">
+        delete from equipment_type where id=#{id}
+    </delete>
+    <select id="selectEquipmentTypeById" parameterType="java.lang.Integer" resultMap="EquipmentTypeBase">
+        select * from equipment_type where id=#{id}
+    </select>
+    <select id="selectEquipmentTypesAll" resultMap="EquipmentTypeBase">
+        select * from equipment_type order by sort_weight ASC
+    </select>
+    <select id="selectEquipmentTypes" parameterType="com.evistek.oa.model.EquipmentTypeBase"
+            resultMap="EquipmentTypeBase">
+        select * from equipment_type
+        <where>
+            <if test="must>-1">and must=#{must}</if>
+            <if test="used>-1">and used=#{used}</if>
+            <if test="inputType>-1">and input_type=#{inputType}</if>
+            <if test="null!=name">and name like "%"#{name}"%"</if>
+        </where>
+        order by sort_weight ASC
+    </select>
+    <select id="selectEquipmentTypesOrderByMust" parameterType="java.lang.Integer"
+            resultMap="EquipmentTypeBase">
+        select * from equipment_type where must=#{must} order by sort_weight ASC
+    </select>
+    <select id="selectEquipmentTypesCode" resultMap="EquipmentTypeBase">
+        select * from equipment_type where sort_weight &lt; 99 order by sort_weight ASC
+    </select>
+</mapper>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.evistek.oa.mapper.CheckingInUser">
+    <resultMap id="CheckingInUserBaseResultMap" type="com.evistek.oa.entity.CheckingInUser">
+        <id column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="dd_id" property="ddId" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+        <result column="sync_list_time" property="syncListTime" jdbcType="VARCHAR"/>
+        <result column="list_time" property="listTime" jdbcType="VARCHAR"/>
+        <result column="sync_list_record_time" property="syncListRecordTime" jdbcType="VARCHAR"/>
+        <result column="list_record_time" property="listRecordTime" jdbcType="VARCHAR"/>
+
+    </resultMap>
+    <insert id="addCheckingInUser" parameterType="com.evistek.oa.entity.CheckingInUser">
+        insert into checking_in_user (phone,dd_id,name,type,create_time,sync_list_time,list_time,sync_list_record_time,list_record_time) values (#{phone},#{ddId},#{name},#{type},now(),#{syncListTime},#{listTime},#{syncListRecordTime},#{listRecordTime})
+    </insert>
+    <update id="updateCheckingInUser" parameterType="com.evistek.oa.entity.CheckingInUser">
+        update checking_in_user
+        <set>
+            <trim suffixOverrides=",">
+                <if test="null!=name">name=#{name},</if>
+                <if test="null!=syncListTime">sync_list_time=#{syncListTime},</if>
+                <if test="null!=listTime">list_time=#{listTime},</if>
+                <if test="null!=syncListRecordTime">sync_list_record_time=#{syncListRecordTime},</if>
+                <if test="null!=listRecordTime">list_record_time=#{listRecordTime},</if>
+            </trim>
+        </set>
+        where dd_id=#{ddId}
+    </update>
+    <select id="selectCheckingInUserByPhone" parameterType="com.evistek.oa.model.CheckingInUserBase"
+            resultMap="CheckingInUserBaseResultMap">
+        select * from checking_in_user where phone=#{phone}
+    </select>
+    <select id="selectCheckingInUserList" resultMap="CheckingInUserBaseResultMap">
+        select * from checking_in_user
+    </select>
+    <select id="findCheckingInUserTotal" resultType="Integer">
+        select count(*) from checking_in_user;
+    </select>
+</mapper>

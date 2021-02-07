@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.evistek.oa.mapper.AssetMapper">
+    <resultMap id="AssetResultMap" type="com.evistek.oa.entity.Asset">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="number" property="number" jdbcType="VARCHAR"/>
+        <result column="type_id" property="typeId" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="model" property="model" jdbcType="VARCHAR"/>
+        <result column="serial_number" property="serialNumber" jdbcType="VARCHAR"/>
+        <result column="brand" property="brand" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="department_id" property="departmentId" jdbcType="VARCHAR"/>
+        <result column="organization_id" property="organizationId" jdbcType="VARCHAR"/>
+        <result column="buy_time" property="buyTime" jdbcType="TIMESTAMP"/>
+        <result column="create_user" property="createUser" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_user" property="updateUser" jdbcType="VARCHAR"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <!--根据id匹配名称-->
+        <association property="typeName" column="type_id" select="findTypeName"/>
+        <association property="departmentName" column="department_id" select="findDepartmentName"/>
+        <association property="organizationName" column="organization_id" select="findOrganizationName"/>
+    </resultMap>
+
+    <!--根据id匹配对应的名称-->
+    <select id="findTypeName" parameterType="String" resultType="String">
+        select name from asset_type where id = #{type_id};
+    </select>
+
+    <select id="findDepartmentName" parameterType="String" resultType="String">
+        select name from department where id = #{department_id};
+    </select>
+
+    <select id="findOrganizationName" parameterType="String" resultType="String">
+        select name from organization where id = #{organization_id};
+    </select>
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <sql id="assetColumn">
+        id,number,type_id,name,model,serial_number,brand,status,department_id,
+        organization_id,buy_time,create_user,create_time,update_user,update_time,remark
+    </sql>
+
+    <sql id="assetParameter">
+        uuid(),#{number},#{typeId},#{name},#{model},#{serialNumber},#{brand},#{status}, #{departmentId},
+        #{organizationId},#{buyTime},#{createUser},now(),#{updateUser},now(),#{remark}
+    </sql>
+
+    <resultMap id="AssetModelResultMap" type="com.evistek.oa.model.AssetModel">
+        <result column="number" property="number" jdbcType="VARCHAR"/>
+        <result column="type_id" property="typeId" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="model" property="model" jdbcType="VARCHAR"/>
+        <result column="serial_number" property="serialNumber" jdbcType="VARCHAR"/>
+        <result column="brand" property="brand" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="buy_time" property="buyTime" jdbcType="TIMESTAMP"/>
+        <association property="typeName" column="type_id" select="findTypeName"/>
+        <association property="assetUseRecord" javaType="com.evistek.oa.entity.AssetUseRecord">
+            <result column="use_type" property="useType" jdbcType="INTEGER"/>
+            <result column="receive_employee_id" property="receiveEmployeeId" jdbcType="VARCHAR"/>
+            <result column="receive_department_id" property="receiveDepartmentId" jdbcType="VARCHAR"/>
+            <result column="receive_time" property="receiveTime" jdbcType="TIMESTAMP"/>
+            <association property="receiveEmployeeName" column="receive_employee_id"
+                         select="findReceiveEmployeeName"/>
+            <association property="receiveDepartmentName" column="receive_department_id"
+                         select="findReceiveDepartmentName"/>
+        </association>
+    </resultMap>
+
+    <select id="findAssetByDepartmentId" parameterType="String" resultMap="AssetModelResultMap">
+        select a.number,a.type_id,a.name,a.model,a.serial_number,a.brand,a.status,a.buy_time,
+        aur.use_type,aur.receive_employee_id,aur.receive_department_id,aur.receive_time
+        from asset a,asset_use_record aur,department_employee_asset dea
+        where a.id = aur.asset_id and a.id = dea.asset_id
+        and aur.status = 1 and dea.department_id = #{departmentId};
+    </select>
+
+    <select id="findReceiveEmployeeName" parameterType="String" resultType="String">
+        select name from employee where id = #{receive_employee_id};
+    </select>
+
+    <select id="findReceiveDepartmentName" parameterType="String" resultType="String">
+        select name from department where id = #{receive_department_id};
+    </select>
+
+    <select id="findAsset" resultMap="AssetResultMap" parameterType="java.util.Map">
+        select * from asset
+        <where>
+            true
+            <if test="number != null">and number like concat(concat('%',#{number}),'%')</if>
+            <if test="type != null">and type = #{type},</if>
+            <if test="status != -1">and status = #{status}</if>
+        </where>
+    </select>
+
+    <select id="findAssetByNumber" parameterType="String" resultMap="AssetResultMap">
+        select * from asset where number = #{number};
+    </select>
+
+    <select id="findAssetByModel" parameterType="String" resultMap="AssetResultMap">
+        select * from asset where model = #{model};
+    </select>
+
+    <select id="findAssetBySerialNumber" parameterType="String" resultMap="AssetResultMap">
+        select * from asset where serial_number = #{serialNumber};
+    </select>
+
+    <select id="findAssetById" parameterType="String" resultMap="AssetResultMap">
+        select * from asset where id = #{id};
+    </select>
+
+    <select id="findAssetTotal" resultType="java.lang.Integer" parameterType="java.util.Map">
+        select count(*) from asset
+        <where>
+            true
+            <if test="number != null">and number like concat(concat('%',#{number}),'%')</if>
+            <if test="typeId != null">and type_id = #{typeId},</if>
+            <if test="status != -1">and status = #{status}</if>
+        </where>
+    </select>
+
+    <select id="findAssetByTypeId" parameterType="String" resultMap="AssetResultMap">
+        select * from asset where type_id = #{typeId};
+    </select>
+
+    <select id="findAssetByEmployeeId" parameterType="String" resultMap="AssetResultMap">
+        select * from asset where id in
+        (select asset_id from department_employee_asset where employee_id = #{employeeId});
+    </select>
+
+    <select id="findAssetByIds" parameterType="List" resultMap="AssetResultMap">
+        select * from asset where id in
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <insert id="addAsset" parameterType="Asset">
+        insert into asset (<include refid="assetColumn"/>)
+        values (<include refid="assetParameter"/>)
+    </insert>
+
+    <delete id="deleteAssetById" parameterType="String">
+        delete from asset where id = #{id};
+    </delete>
+
+    <update id="updateAssetStatus" parameterType="Map">
+        update asset set status = #{status} where id in
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="updateAssetById" parameterType="Asset">
+        update asset
+        <set>
+            <if test="number != null">number = #{number},</if>
+            <if test="typeId != null">type_id = #{typeId},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="model != null">model = #{model},</if>
+            <if test="serialNumber != null">serial_number = #{serialNumber},</if>
+            <if test="brand != null">brand = #{brand},</if>
+            <if test="status != -1">status = #{status},</if>
+            <if test="departmentId != null">department_id = #{departmentId},</if>
+            <if test="organizationId != null">organization_id = #{organizationId},</if>
+            <if test="updateUser != null">update_user = #{updateUser},</if>
+            <if test="updateTime != null">update_time = now(),</if>
+            <if test="remark != null">remark = #{remark}</if>
+        </set>
+        where id = #{id};
+    </update>
+</mapper>

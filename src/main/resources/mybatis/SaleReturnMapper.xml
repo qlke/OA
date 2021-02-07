@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.evistek.oa.mapper.SaleReturnMapper">
+    <resultMap id="SaleReturnResultMap" type="com.evistek.oa.entity.SaleReturn">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="return_time" property="returnTime" jdbcType="TIMESTAMP"/>
+        <result column="return_number" property="returnNumber" jdbcType="VARCHAR"/>
+        <result column="sale_client" property="saleClient" jdbcType="VARCHAR"/>
+        <result column="last_number" property="lastNumber" jdbcType="VARCHAR"/>
+        <result column="servicer" property="servicer" jdbcType="VARCHAR"/>
+        <result column="department" property="department" jdbcType="VARCHAR"/>
+        <result column="deduct_type" property="deductType" jdbcType="INTEGER"/>
+        <result column="bookbuilding" property="bookBuilding" jdbcType="INTEGER"/>
+        <result column="bill_type" property="billType" jdbcType="INTEGER"/>
+        <result column="client_order" property="clientOrder" jdbcType="VARCHAR"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="create_user" property="createUser" jdbcType="VARCHAR"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="update_user" property="updateUser" jdbcType="VARCHAR"/>
+        <result column="repair_id" property="repairId" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="SaleReturnColumn">
+        id,return_time,return_number,sale_client,last_number,servicer,department,deduct_type,
+        bookbuilding,bill_type,client_order,remark,create_user,create_time,update_user,update_time,
+        repair_id
+    </sql>
+
+    <sql id="SaleReturnParameter">
+       uuid(),#{returnTime},#{returnNumber},#{saleClient},#{lastNumber},#{servicer},#{department},
+       #{deductType},#{bookBuilding},#{billType},#{clientOrder},#{remark},#{createUser},
+       now(),#{updateUser},now(),#{repairId}
+    </sql>
+
+    <select id="findSaleReturnByRepairId" parameterType="String" resultMap="SaleReturnResultMap">
+    select * from sale_return where repair_id = #{repairId};
+    </select>
+
+    <insert id="addSaleReturn" parameterType="SaleReturn">
+        insert into sale_return (<include refid="SaleReturnColumn"/>)
+        value (<include refid="SaleReturnParameter"/>)
+    </insert>
+
+    <update id="updateSaleReturn" parameterType="SaleReturn">
+        update sale_return
+        <set>
+            <if test="returnTime != null">return_time = #{returnTime},</if>
+            <if test="returnNumber != null">return_number = #{returnNumber},</if>
+            <if test="saleClient != null">sale_client = #{saleClient},</if>
+            <if test="lastNumber != null">last_number = #{lastNumber},</if>
+            <if test="servicer != null">servicer = #{servicer},</if>
+            <if test="department != null">department = #{department},</if>
+            <if test="deductType != -1">deduct_type = #{deductType},</if>
+            <if test="bookBuilding != -1">bookbuilding = #{bookBuilding},</if>
+            <if test="billType != -1">bill_type = #{billType},</if>
+            <if test="clientOrder != null">client_order = #{clientOrder},</if>
+            <if test="updateUser != null">update_user = #{updateUser},</if>
+            <if test="updateTime != null">update_time = now()</if>
+        </set>
+        where id = #{id};
+    </update>
+
+    <delete id="deleteSaleReturnByRepairId" parameterType="String">
+        delete from sale_return where repair_id = #{repairId};
+    </delete>
+
+</mapper>

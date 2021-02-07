@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.evistek.oa.mapper.DepartmentEmployeeAssetMapper">
+    <resultMap id="DepartmentEmployeeAssetResultMap" type="com.evistek.oa.entity.DepartmentEmployeeAsset">
+        <result column="department_id" property="departmentId" jdbcType="VARCHAR"/>
+        <result column="employee_id" property="employeeId" jdbcType="VARCHAR"/>
+        <result column="asset_id" property="assetId" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="findDEAByAssetId" parameterType="String" resultMap="DepartmentEmployeeAssetResultMap">
+        select * from department_employee_asset where asset_id = #{assetId};
+    </select>
+
+    <insert id="addDEA" parameterType="java.util.Map">
+        insert into department_employee_asset (employee_id, department_id, asset_id)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{employeeId},#{departmentId},#{item})
+        </foreach>
+    </insert>
+
+    <delete id="deleteDEAByAssetId" parameterType="java.util.List">
+        delete from department_employee_asset where asset_id in
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+</mapper>

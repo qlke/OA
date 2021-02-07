@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.evistek.oa.mapper.EquipmentBindType">
+    <resultMap id="EquipmentBindTypeBase" type="com.evistek.oa.entity.EquipmentBindType">
+        <result column="mid" property="mid" jdbcType="INTEGER"/>
+        <result column="tid" property="tid" jdbcType="INTEGER"/>
+        <result column="aid" property="aid" jdbcType="INTEGER"/>
+        <result column="t_value" property="tValue" jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap id="EquipmentBindTypeModel" type="com.evistek.oa.model.EquipmentBindTypeModel">
+        <result column="mid" property="mid" jdbcType="INTEGER"/>
+        <result column="tid" property="tid" jdbcType="INTEGER"/>
+        <result column="aid" property="aid" jdbcType="INTEGER"/>
+        <result column="t_value" property="tValue" jdbcType="VARCHAR"/>
+        <association property="equipmentType" javaType="com.evistek.oa.entity.EquipmentType" column="tid"
+                     select="com.evistek.oa.mapper.EquipmentType.selectEquipmentTypeById"/>
+        <association property="equipmentAttribute" javaType="com.evistek.oa.entity.EquipmentAttribute" column="aid"
+                     select="com.evistek.oa.mapper.EquipmentAttribute.selectEquipmentAttributeById"/>
+    </resultMap>
+    <sql id="EquipmentBindTypeC">
+        mid,tid,aid,t_value
+    </sql>
+    <sql id="EquipmentBindTypeP">
+        #{mid},#{tid},#{aid},#{tValue}
+    </sql>
+
+    <insert id="addEquipmentBindType" parameterType="com.evistek.oa.entity.EquipmentBindType">
+        insert into equipment_bind_type (<include refid="EquipmentBindTypeC"/>) values (<include
+            refid="EquipmentBindTypeP"/>)
+    </insert>
+    <update id="updateEquipmentBindType" parameterType="com.evistek.oa.entity.EquipmentBindType">
+        update equipment_bind_type
+        <set>
+            <trim suffixOverrides=",">
+                <if test="aid>-1">aid=#{aid},</if>
+                <if test="null!=tValue and tValue!=''">t_value=#{tValue},</if>
+            </trim>
+        </set>
+        where mid=#{mid} and tid=#{tid}
+    </update>
+    <delete id="deleteEquipmentBindType" parameterType="com.evistek.oa.entity.EquipmentBindType">
+        delete from equipment_bind_type where mid=#{mid} and tid=#{tid}
+    </delete>
+    <delete id="deleteEquipmentBindTypeByMid" parameterType="java.lang.Integer">
+        delete from equipment_bind_type where mid=#{mid}
+    </delete>
+    <delete id="deleteEquipmentBindTypeByTid" parameterType="java.lang.Integer">
+        delete from equipment_bind_type where tid=#{tid}
+    </delete>
+    <select id="selectEquipmentByMid" parameterType="java.lang.Integer" resultMap="EquipmentBindTypeModel">
+        select * from equipment_bind_type where mid=#{mid}
+    </select>
+    <select id="selectEquipmentDetail" parameterType="com.evistek.oa.entity.EquipmentBindType"
+            resultMap="EquipmentBindTypeModel">
+        select * from equipment_bind_type where mid=#{mid} and tid=#{tid}
+    </select>
+    <select id="selectEquipmentMidTid" parameterType="com.evistek.oa.entity.EquipmentBindType"
+            resultMap="EquipmentBindTypeBase">
+        select * from equipment_bind_type where mid=#{mid} and tid=#{tid}
+    </select>
+    <select id="selectEquipmentTid" parameterType="java.lang.Integer"
+            resultMap="EquipmentBindTypeBase">
+        select * from equipment_bind_type where tid=#{tid}
+    </select>
+</mapper>

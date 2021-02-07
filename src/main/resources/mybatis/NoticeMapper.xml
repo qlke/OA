@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.evistek.oa.mapper.NoticeMapper">
+    <resultMap id="NoticeResultMap" type="com.evistek.oa.entity.Notice">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="title" property="title" jdbcType="VARCHAR"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="publish" property="publish" jdbcType="INTEGER"/>
+        <result column="user_id" property="userId" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="create_user" property="createUser" jdbcType="VARCHAR"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="update_user" property="updateUser" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查找所有已发布的通知-->
+    <select id="findAllPublishNotice" resultMap="NoticeResultMap">
+    select * from notice where publish = 1;
+    </select>
+
+    <select id="findAllPublicNoticeTotal" resultType="Integer">
+        select count(*) from notice where publish = 1;
+    </select>
+
+    <!--查找发布给当前用户（包含所在组织机构、部门）的通知-->
+    <select id="findPublishNotice" parameterType="List" resultMap="NoticeResultMap">
+        select * from notice where publish = 1 and id in
+        (select notice_id from object_notice where object_id in
+        <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+            #{item}
+        </foreach>);
+    </select>
+
+    <select id="findPublicNoticeTotal" resultType="Integer" parameterType="List">
+        select count(*) from notice where publish = 1 and id in
+        (select notice_id from object_notice where object_id in
+        <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+            #{item}
+        </foreach>);
+    </select>
+
+    <!--查找当前用户起草的所有通知-->
+    <select id="findNotice" parameterType="String" resultMap="NoticeResultMap">
+        select * from notice where user_id = #{userId};
+    </select>
+
+    <select id="findNoticeTotal" resultType="Integer" parameterType="String">
+        select count(*) from notice where user_id = #{userId};
+    </select>
+
+    <select id="findNoticeById" parameterType="String" resultMap="NoticeResultMap">
+        select * from notice where id = #{id};
+    </select>
+
+    <insert id="addNotice" parameterType="Notice">
+        insert into
+        notice (id, title, content, publish, user_id, create_time, create_user, update_time, update_user)
+        value (uuid(),#{title},#{content},#{publish},#{userId},now(),#{createUser},now(),#{updateUser});
+    </insert>
+
+    <update id="updateNoticeById" parameterType="Notice">
+        update notice
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="publish != -1"> publish = #{publish},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="updateTime != null">update_time = now(),</if>
+            <if test="updateUser != null">update_user = #{updateUser}</if>
+        </set>
+        where id = #{id};
+    </update>
+
+    <delete id="deleteNoticeById" parameterType="String">
+        delete from notice where id = #{id};
+    </delete>
+
+    <update id="updatePublishById" parameterType="Map">
+        update notice set publish = 1 where id = #{id};
+    </update>
+</mapper>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.evistek.oa.mapper.RepairCostMapper">
+    <resultMap id="RepairCostResultMap" type="com.evistek.oa.entity.RepairCost">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="client_name" property="clientName" jdbcType="VARCHAR"/>
+        <result column="product_name" property="productName" jdbcType="VARCHAR"/>
+        <result column="product_number" property="productNumber" jdbcType="VARCHAR"/>
+        <result column="delivery_time" property="deliveryTime" jdbcType="TIMESTAMP"/>
+        <result column="salesman" property="salesman" jdbcType="VARCHAR"/>
+        <result column="contract_number" property="contractNumber" jdbcType="VARCHAR"/>
+        <result column="expire" property="expire" jdbcType="INTEGER"/>
+        <result column="un_phenomenon" property="unPhenomenon" jdbcType="VARCHAR"/>
+        <result column="fault_cause" property="faultCause" jdbcType="VARCHAR"/>
+        <result column="treatment_measure" property="treatmentMeasure" jdbcType="VARCHAR"/>
+        <result column="logistics_cost" property="logisticsCost" jdbcType="DECIMAL"/>
+        <result column="pack_cost" property="packCost" jdbcType="DECIMAL"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="create_user" property="createUser" jdbcType="VARCHAR"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="update_user" property="updateUser" jdbcType="VARCHAR"/>
+        <result column="repair_id" property="repairId" jdbcType="VARCHAR"/>
+        <association property="materials" column="id"
+                     select="com.evistek.oa.mapper.MaterialMapper.findMaterialByRepairCostId"/>
+    </resultMap>
+
+    <sql id="RepairCostColumn">
+        id,client_name,product_name,product_number,delivery_time,salesman,contract_number,expire,
+        un_phenomenon,fault_cause,treatment_measure,logistics_cost,pack_cost,create_time,
+        create_user,update_time,update_user,repair_id
+    </sql>
+
+    <sql id="RepairCostParameter">
+        uuid(),#{clientName},#{productName},#{productNumber},#{deliveryTime},#{salesman},
+        #{contractNumber},#{expire},#{unPhenomenon},#{faultCause},#{treatmentMeasure},
+        #{logisticsCost},#{packCost},now(),#{createUser},now(),#{updateUser},#{repairId}
+    </sql>
+
+    <select id="findRepairCostByRepairId" parameterType="String" resultMap="RepairCostResultMap">
+        select * from repair_cost where repair_id = #{repairId};
+    </select>
+
+    <select id="findRepairCostById" parameterType="String" resultMap="RepairCostResultMap">
+        select * from repair_cost where id = #{id};
+    </select>
+
+    <insert id="addRepairCost" parameterType="RepairCost">
+        insert into repair_cost (<include refid="RepairCostColumn"/>)
+        value (<include refid="RepairCostParameter"/>);
+    </insert>
+
+    <update id="updateRepairCost" parameterType="RepairCost">
+        update repair_cost
+        <set>
+            <if test="clientName != null">client_name = #{clientName},</if>
+            <if test="productName != null">product_name = #{productName},</if>
+            <if test="productNumber != null">product_number = #{productNumber},</if>
+            <if test="deliveryTime != null">delivery_time = #{deliveryTime},</if>
+            <if test="salesman != null">salesman = #{salesman},</if>
+            <if test="contractNumber != null">contract_number = #{contractNumber},</if>
+            <if test="expire != -1">expire = #{expire},</if>
+            <if test="unPhenomenon != null">un_phenomenon = #{unPhenomenon},</if>
+            <if test="faultCause != null">fault_cause = #{faultCause},</if>
+            <if test="treatmentMeasure != null">treatment_measure = #{treatmentMeasure},</if>
+            <if test="logisticsCost != null">logistics_cost = #{logisticsCost},</if>
+            <if test="packCost != null">pack_cost = #{packCost},</if>
+            <if test="updateTime != null">update_time = now(),</if>
+            <if test="updateUser != null">update_user = #{updateUser}</if>
+        </set>
+        where id = #{id};
+    </update>
+
+    <delete id="deleteRepairCostById" parameterType="String">
+        delete from repair_cost where id = #{id};
+    </delete>
+</mapper>
